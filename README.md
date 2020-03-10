@@ -9,4 +9,4 @@ Because ACO becomes more accurate with more iterations, we are going to have to 
 As it stands right now, with T=100 and m=25, we can solve test-case-1 for full points in 6 seconds.
 
 I think we should implement multiprocessing instead of multithreading (which is currently implemented) so that the ants don't run in sequence, but in parallel.
-Hopefully that speed things up enough to where we can increase the number of iterations and ants without breaking that 5 minute limit.
+Hopefully that speeds things up enough to where we can increase the number of iterations and ants without breaking that 5 minute limit.
