@@ -2,7 +2,9 @@ import math
 import random
 import numpy as np
 import time
-from multiprocessing import Process, Value, Array
+# from multiprocessing import Process, Value, Array
+from threading import Thread
+import sys
 
 def d(u, v):
     return round(math.sqrt((u[0]-v[0])*(u[0]-v[0])+(u[1]-v[1])*(u[1]-v[1])), 0)
@@ -12,10 +14,10 @@ class graph:
         self.cities = {}
         self.cityDistances = []
 
-class Ant(Process):
+class Ant(Thread):
     def __init__(self, startCity, availableCities, pheromoneTrail, alpha, beta, getDistance, first_pass=False):
         # have ants run in seperate threads to speed up execution time
-        self.process = Process(target=self.run, args=())
+        self.thread = Thread(target=self.run, args=())
         self.first_pass = first_pass
         self.startCity = startCity
         self.availableCities = availableCities.copy()
@@ -181,13 +183,13 @@ class AntColony:
 
     def run(self):
         for t in range(self.iterations):
-            #start multi-threaded ants, calls ant.run() in a new process
+            #start multi-threaded ants, calls ant.run() in a new thread
             for ant in self.ants:
-                ant.process.start()
+                ant.thread.start()
 
             # wait for ants to finish before updating shared resources (pheromone maps)
             for ant in self.ants:
-                ant.process.join()
+                ant.thread.join()
 
             for ant in self.ants:
                 #update and_updated_pheromone map with this ant's contribution along its route
@@ -226,8 +228,8 @@ class AntColony:
         return finalPath
         
 def processInput(graphInput):
-    #testFileName = sys.argv[1]
-    testFileName = "test-input-2.txt"
+    testFileName = sys.argv[1]
+    # testFileName = "test-input-2.txt"
     graphInput.testFileName = testFileName          #Save fileName for output file
     #print("This is test file: " + testFileName)
 
@@ -302,8 +304,8 @@ def main():
     startTime = time.time()
 
     T = 100
-    m = 3
-    colony = AntColony(tspGraph.cities, tspGraph.cityDistances, None, m, alpha=1.0, beta=1.0, pheromone_evaporation_rate=0.66, pheromone_constant=10000, iterations=T)
+    m = 25
+    colony = AntColony(tspGraph.cities, tspGraph.cityDistances, None, m, alpha=1.0, beta=1.0, pheromone_evaporation_rate=0.6, pheromone_constant=10000, iterations=T)
     bestPath = colony.run()
     print(colony.shortest_path)
     print(colony.shortest_distance)
