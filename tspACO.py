@@ -14,10 +14,10 @@ class graph:
         self.cities = {}
         self.cityDistances = []
 
-class Ant(Thread):
+class Ant:
     def __init__(self, startCity, availableCities, pheromoneTrail, alpha, beta, getDistance, first_pass=False):
         # have ants run in seperate threads to speed up execution time
-        self.thread = Thread(target=self.run, args=())
+        # self.thread = Thread(target=self.run, args=())
         self.first_pass = first_pass
         self.startCity = startCity
         self.availableCities = availableCities.copy()
@@ -57,7 +57,7 @@ class Ant(Thread):
             distance = float(self.distanceFunc(self.currentCity, availableCity))
 
             if distance == 0:
-                print("error: {}, {}".format(self.currentCity, availableCity))
+                distance = np.nextafter(0, 1)
 
             attractiveness[availableCity] = (pheromoneLevel ** self.alpha) * ((1/distance) ** self.beta)
             total += attractiveness[availableCity]
@@ -146,7 +146,7 @@ class AntColony:
         # if distance hasn't already been calculated, calculate it (this should save computation time)
         if not self.cityDistances[n1][n2]:
             distance = d(self.cities[n1], self.cities[n2])
-            self.cityDistances[n1][n2] = distance 
+            self.cityDistances[n1][n2] = distance
             return distance
             
         return self.cityDistances[n1][n2]
@@ -174,7 +174,6 @@ class AntColony:
     def _populate_ant_updated_pheromone_map(self, ant):
         for i in range(len(ant.path) - 1):
             currPheromoneVal = float(self.ant_updated_pheromone_map[ant.path[i]][ant.path[i+1]])
-
             #  delta tau_xy_k = Q / L_k
             newPheromoneVal = self.pheromone_constant/ant.get_distance_traveled()
 
@@ -185,11 +184,11 @@ class AntColony:
         for t in range(self.iterations):
             #start multi-threaded ants, calls ant.run() in a new thread
             for ant in self.ants:
-                ant.thread.start()
+                ant.run()
 
-            # wait for ants to finish before updating shared resources (pheromone maps)
-            for ant in self.ants:
-                ant.thread.join()
+            # # wait for ants to finish before updating shared resources (pheromone maps)
+            # for ant in self.ants:
+            #     ant.thread.join()
 
             for ant in self.ants:
                 #update and_updated_pheromone map with this ant's contribution along its route
@@ -303,8 +302,8 @@ def main():
 
     startTime = time.time()
 
-    T = 100
-    m = 25
+    T = 200
+    m = 50
     colony = AntColony(tspGraph.cities, tspGraph.cityDistances, None, m, alpha=1.0, beta=1.0, pheromone_evaporation_rate=0.6, pheromone_constant=10000, iterations=T)
     bestPath = colony.run()
     print(colony.shortest_path)

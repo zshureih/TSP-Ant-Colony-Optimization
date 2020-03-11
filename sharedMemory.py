@@ -307,9 +307,9 @@ def main():
 
     startTime = time.time()
 
-    T = 100
-    m = 25
-    colony = AntColony(tspGraph.cities, tspGraph.cityDistances, None, m, alpha=1.0, beta=1.5, pheromone_evaporation_rate=0.6, pheromone_constant=10000, iterations=T)
+    T = 150
+    m = 75
+    colony = AntColony(tspGraph.cities, tspGraph.cityDistances, None, m, alpha=1.0, beta=1.2, pheromone_evaporation_rate=0.65, pheromone_constant=10000, iterations=T)
     bestPath = colony.run()
     print("T = {}, m = {}".format(T, m))
     print(colony.shortest_path)
@@ -348,7 +348,10 @@ def main():
     for i in range(len(colony.shortest_path) - 1):
         if i == 0:
             outFile.write("{}\n".format(round(colony.shortest_distance, 0)))
-        outFile.write(str(colony.shortest_path[i])+'\n')
+        if i == len(colony.shortest_path) - 1:
+            outFile.write(str(colony.shortest_path[i]))
+        else:
+            outFile.write("{}\n".format(colony.shortest_path[i]))
 
     outFile.close()
 
